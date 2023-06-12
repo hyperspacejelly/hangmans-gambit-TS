@@ -1,66 +1,121 @@
 import { useEffect, useState } from "react"
-import { TimerComponent, Time } from "./Components/Timer"
+import { TimerComponent } from "./Components/Timer"
+import Healthbar from "./Components/Healthbar";
 
+import DifficultySelect, {difficulties} from "./Components/DifficultySelect";
 
-function timerUpdate(prev :Time, amount: Time) :Time{
-  let returnTime: Time = {min:0, sec:0, ms:0};
-        if (amount.min > prev.min && amount.min > 0) {
-          return returnTime;
-        } else {
+import settings from './params.json';
+import words from './wordList.json';
+import WordReveal from "./Components/WordReveal";
 
-          returnTime.min = prev.min - amount.min;
+type difficultySettings = {
+  hp :number,
+  hiddenLettersRatio :number,
+  totalTimeRatio :number
+}
 
-          if (amount.sec >= prev.sec && amount.sec) {
-            returnTime.sec = 59 - (amount.sec - prev.sec);
-            if (returnTime.min >= 1) {
-              returnTime.min = (prev.min - (1+ amount.min)) >= 0 ? (prev.min - (1+ amount.min)) : 0 ;
-            }
-          }else{
-            returnTime.sec = prev.sec - amount.sec;
-          }
+interface settings {
+  baseTimePerLetterMs :number,
+  difficultySettings :difficultySettings[]
+}
 
-          if (amount.ms >= prev.ms && amount.ms) {
-            returnTime.ms = 999 - (amount.ms - prev.ms);
-            if (prev.min > 0 && prev.sec >= 1 && amount.ms) {
-              returnTime.sec = (prev.sec - (1+ amount.sec)) >= 0 ? (prev.sec - (1+ amount.sec)) : 0;
-            }
-          } else {
-            returnTime.ms = prev.ms - amount.ms;
-          }
-  
-          
-        }
-        return returnTime;
+// the word to guess will be constituted of an array of letters (visible or not)
+export type letterToFind = {
+  hidden :boolean;
+  letter :string;
 }
 
 
+function getWord() :string{
+  const maxIndex = words.length;
+  const randomIndex = Math.floor(Math.random() * maxIndex);
+
+  return words[randomIndex];
+}
+
+function genRandomNumberArray(arraySize :number, maxNumber :number) :number[]{
+  let returnArray :number[] = [];
+  for(let i = 0; i < arraySize;i++){
+    let randomNum: number = 0;
+    do{
+      randomNum = Math.floor(Math.random() * maxNumber);
+    }while(returnArray.includes(randomNum));
+
+    returnArray.push(randomNum)
+  }
+  return returnArray;
+}
+
+function createWordToFindArray(word :string, hiddenLettersRatio :number) :letterToFind[]{
+  const hiddenLetters = genRandomNumberArray(Math.floor(word.length * hiddenLettersRatio), (word.length));
+  let returnArray :Array<letterToFind> = [];
+  console.log(hiddenLetters);
+  for(let i=0;i<word.length;i++){
+    console.log("i : "+i+". hiddenletters[i]: "+hiddenLetters.includes(i));
+    returnArray.push({
+      hidden: hiddenLetters.includes(i)?true:false,
+      letter:word.split('')[i]
+    });
+  }
+
+  return returnArray;
+}
+
 function App() {
-  const [appTimer, setAppTimer] = useState<Time>({
-    min: 1,
-    sec: 30,
-    ms: 0
-  });
+  const [difficultySettings, setDifficultySettings] = useState<difficultySettings | null>(null);
 
-  const countdownRate: number = 1000;
+  const [timerStart, setTimerStart] = useState<boolean>(false);
+  const [timerComplete, setTimerComplete] = useState<boolean>(false);
 
-  useEffect(() => {
-    const interval = setInterval(() => {
-      const amount: Time = {
-        min: Math.floor(countdownRate / 60000),
-        sec: Math.floor(countdownRate / 1000),
-        ms: countdownRate % 1000
-      }
+  const [hp, setHp] = useState(settings.difficulty.easy.hp);
+  const [wordToFindArray, setWordToFindArray] = useState<letterToFind[]>([]);
+  const [wordToFind, setWordToFind] = useState<string>("");
 
-      setAppTimer(prev => timerUpdate(prev, amount));
-    }, countdownRate);
+  function handleDifficultySelect(difficulty :difficulties){
+    const difficultyValue = (settings as any).difficulty[difficulty];
+    setDifficultySettings(difficultyValue);
+    const word = getWord();
+    const ratio = difficultyValue.hiddenLettersRatio;
+    const wordToFindValue = createWordToFindArray(word, ratio);
 
-    return () => clearInterval(interval);
-  }, [appTimer])
+    setWordToFind(word);
+    setWordToFindArray(wordToFindValue);
+  }
+
+  function timerTotalTime() :number{
+    let returnValue :number = 0;
+    if(difficultySettings && wordToFind){
+      returnValue = Math.ceil(wordToFind.length * (1 - difficultySettings.hiddenLettersRatio)) * (difficultySettings.totalTimeRatio * settings.baseTimePerLetterMs);
+    }
+    return returnValue;
+  }
+
+  useEffect(()=>{
+
+  }, [difficultySettings]);
 
   return (
     <main>
-      <TimerComponent time={appTimer} />
-      <div>{`${appTimer.sec}`}</div>
+      {difficultySettings&& <div>
+        <Healthbar hp={hp} />
+        <TimerComponent timerTimeMs={timerTotalTime()} 
+              timerStart={timerStart} 
+              setTimerComplete={setTimerComplete} 
+              setTimerStart={setTimerStart} />
+        <button onClick={()=>{
+            setTimerStart(prev=>!prev);
+          }}>{timerStart?"Stop":"Start"} Timer</button>
+        <button onClick={()=>{
+          setHp(currHp => currHp-1);
+        }}>-1HP</button>
+        <p>{timerComplete? "Countdown Over":""}</p>
+        <WordReveal wordToFind={wordToFindArray} />
+      </div>}
+      {!difficultySettings &&<div>
+            <h2>Select a difficulty</h2>
+            <DifficultySelect setDifficulty={handleDifficultySelect}/>
+        </div>
+      }
     </main>
   )
 }

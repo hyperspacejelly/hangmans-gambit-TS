@@ -1,51 +1,77 @@
+import { useEffect, useState, useRef } from "react";
 
-export interface Time {
+interface Time {
     min: number,
     sec: number,
     ms: number
 }
 
 type TimerProps = {
-    time: Time
+    timerTimeMs: number,
+    timerStart: boolean,
+    setTimerStart : React.Dispatch<React.SetStateAction<boolean>>,
+    setTimerComplete: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
-export function timerCountdown(currentTime :Time, amount: Time): Time{
-    let returnTime :Time = currentTime;
-
-    if(amount.ms > returnTime.ms){
-        returnTime.ms = 1000 - (amount.ms - returnTime.ms);
-        if(returnTime.min>0 && returnTime.sec>=1){
-            returnTime.sec -=1;
+function msToTime(valueMs :number) :Time{
+    let returnTime = {min:0,sec:0,ms:0}
+    
+    if(valueMs > 0){
+        returnTime ={
+            min:Math.floor(valueMs / 60000),
+            sec:Math.trunc((valueMs%60000)/1000),
+            ms:valueMs%1000
         }
-    }else{
-        returnTime.ms -= amount.ms;
     }
-
-    if(amount.sec > returnTime.sec){
-        returnTime.sec = 60 - (amount.sec - returnTime.sec);
-        if(returnTime.min>=1){
-            returnTime.min -=1;
-        }
-    }else{
-        returnTime.sec -= amount.sec;
-    }
-
-    if(amount.min > currentTime.min){
-        returnTime.ms=0;
-        returnTime.sec=0;
-        returnTime.min=0;
-    }else{
-        returnTime.min-=amount.min;
-    }
-
-    return returnTime;
+    return returnTime
 }
 
+export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimerComplete} :TimerProps){
+    const [timerInit, setTimerInit] = useState<number>(0);
+    const [totalTimeLeft, setTotalTimeLeft] = useState<number>(timerTimeMs); 
+    const [timeLeft, setTimeLeft] = useState<number>(timerTimeMs);
+    const refreshInterval = useRef<number>();
+    const refreshRate = 1;   
+    
+    useEffect(()=>{
+        if(refreshInterval.current){
+            clearInterval(refreshInterval.current); //clean up interval on unmount
+        }
+    },[])
 
-export function TimerComponent({time} :TimerProps){
+    useEffect(()=>{
+        if(timerStart){
+            setTimerInit(Date.now()); //set references time for countdown
+        }
+        if(!timerStart && timerInit){
+            setTimerInit(0); //on stop reset the ref time
+            setTotalTimeLeft(timeLeft); // update the time left to till the countdown is over
+        }
+    },[timerStart]);
+
+    useEffect(()=>{
+        if(timerInit!==0){
+            refreshInterval.current = setInterval(()=>{
+                /*time left = amount of time for the timer - (current time - time of starting or restarting timer)*/
+                setTimeLeft(totalTimeLeft-(Date.now() - timerInit)); 
+                if(totalTimeLeft-(Date.now() - timerInit) < 0){
+                    setTimerComplete(true); //if countdown over update state to reflect that 
+                    setTimerStart(false);// and stop countdown/clear interval
+                }
+            }, refreshRate);
+        }
+        if(timerInit===0 && refreshInterval.current !== 0){
+            clearInterval(refreshInterval.current); //on Stop, clear the interval to stop the countdown
+        }
+    },[timerInit]);
+
     return(
         <div style={{fontSize:'4rem'}}>
-        {`${time.min}:${time.sec}:${time.ms}`}
+        {`
+        ${msToTime(timeLeft).min<10?"0":""}${msToTime(timeLeft).min}:
+        ${msToTime(timeLeft).sec<10?"0":""}${msToTime(timeLeft).sec}:
+        ${msToTime(timeLeft).ms < 100?"0":""}${msToTime(timeLeft).ms < 10?"0":""}${msToTime(timeLeft).ms}
+        `}
         </div>
     );
 }
