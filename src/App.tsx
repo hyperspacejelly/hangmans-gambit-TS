@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react"
+import { useState } from "react"
 import { TimerComponent } from "./Components/Timer"
 import Healthbar from "./Components/Healthbar";
 
@@ -7,6 +7,8 @@ import DifficultySelect, {difficulties} from "./Components/DifficultySelect";
 import settings from './params.json';
 import words from './wordList.json';
 import WordReveal from "./Components/WordReveal";
+import LettersLeft from "./Components/LettersLeft";
+import PlayArea from "./Components/PlayArea";
 
 type difficultySettings = {
   hp :number,
@@ -62,15 +64,19 @@ function createWordToFindArray(word :string, hiddenLettersRatio :number) :letter
 }
 
 function App() {
+  // stores difficulty settings chosen by player
   const [difficultySettings, setDifficultySettings] = useState<difficultySettings | null>(null);
 
+  // reflect whether the timer is running or not
   const [timerStart, setTimerStart] = useState<boolean>(false);
+  // reflects whether the timer has run its full course or not 
   const [timerComplete, setTimerComplete] = useState<boolean>(false);
 
   const [hp, setHp] = useState(settings.difficulty.easy.hp);
   const [wordToFindArray, setWordToFindArray] = useState<letterToFind[]>([]);
   const [wordToFind, setWordToFind] = useState<string>("");
 
+  // sets difficulty and generates an array with the right amount of hidden letters
   function handleDifficultySelect(difficulty :difficulties){
     const difficultyValue = (settings as any).difficulty[difficulty];
     setDifficultySettings(difficultyValue);
@@ -82,6 +88,7 @@ function App() {
     setWordToFindArray(wordToFindValue);
   }
 
+  // calculates the total time for the countdown based on difficulty and number of hidden letters
   function timerTotalTime() :number{
     let returnValue :number = 0;
     if(difficultySettings && wordToFind){
@@ -90,30 +97,37 @@ function App() {
     return returnValue;
   }
 
-  useEffect(()=>{
-
-  }, [difficultySettings]);
-
   return (
     <main>
-      {difficultySettings&& <div>
-        <Healthbar hp={hp} />
-        <TimerComponent timerTimeMs={timerTotalTime()} 
-              timerStart={timerStart} 
-              setTimerComplete={setTimerComplete} 
-              setTimerStart={setTimerStart} />
-        <button onClick={()=>{
-            setTimerStart(prev=>!prev);
-          }}>{timerStart?"Stop":"Start"} Timer</button>
-        <button onClick={()=>{
-          setHp(currHp => currHp-1);
-        }}>-1HP</button>
-        <p>{timerComplete? "Countdown Over":""}</p>
-        <WordReveal wordToFind={wordToFindArray} />
-      </div>}
-      {!difficultySettings &&<div>
-            <h2>Select a difficulty</h2>
-            <DifficultySelect setDifficulty={handleDifficultySelect}/>
+      {difficultySettings && <>
+        <div id="hangman-UI">
+          <section id="top-right">
+            <div style={{width:'fit-content'}}>
+              <TimerComponent timerTimeMs={timerTotalTime()} 
+                    timerStart={timerStart} 
+                    setTimerComplete={setTimerComplete} 
+                    setTimerStart={setTimerStart} />
+              <Healthbar hp={hp} />
+            </div>
+            <p>{timerComplete? "Countdown Over":""}</p>
+          </section>
+          <section id="top-left">
+            <LettersLeft wordToFindArray={wordToFindArray} />
+          </section>
+          <section id="center">
+            <button style={{gridColumn:"1/span2"}}onClick={()=>{
+                setTimerStart(prev=>!prev);
+              }}>{timerStart?"Stop":"Start"} Timer</button>
+            <PlayArea wordToFindArray={wordToFindArray} />
+          </section>
+          <section id="bottom">
+            <WordReveal wordToFind={wordToFindArray} />
+          </section>
+        </div>
+      </>}
+
+      {!difficultySettings &&<div id="diff-select-cont">
+          <DifficultySelect setDifficulty={handleDifficultySelect}/>
         </div>
       }
     </main>

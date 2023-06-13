@@ -1,3 +1,5 @@
+import './CSS/diffselect.css';
+
 export type difficulties = "easy" | "normal" | "hard";
 
 type DifficultySelectProps = {
@@ -10,10 +12,15 @@ function DifficultySelect({setDifficulty} :DifficultySelectProps){
         setDifficulty(param);
     }
 
-    return <div style={{fontSize: '4em'}}>
-        <button onClick={()=>handleClick("easy")}>Easy</button>
-        <button onClick={()=>handleClick("normal")}>Normal</button>
-        <button onClick={()=>handleClick("hard")}>Hard</button>
+    return <div className="diff-select">
+        <section>
+            <h2>Select a difficulty</h2>
+        </section>
+        <section>
+            <button onClick={()=>handleClick("easy")}>Easy</button>
+            <button onClick={()=>handleClick("normal")}>Normal</button>
+            <button onClick={()=>handleClick("hard")}>Hard</button>
+        </section>
     </div>
 }
 

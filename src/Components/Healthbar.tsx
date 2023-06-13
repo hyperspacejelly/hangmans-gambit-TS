@@ -1,3 +1,5 @@
+import './CSS/healthbar.css';
+
 type HealthbarProps = {
     hp :number
 }
@@ -13,7 +15,7 @@ function Healthbar({hp} :HealthbarProps){
         return health;
     }
 
-    return<div style={{fontSize: '3rem'}}>
+    return<div id="healthbar">
         {renderHealth()}
     </div>
 }

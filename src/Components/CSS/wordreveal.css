@@ -1,0 +1,50 @@
+#word-display{
+    font-size: 4rem;
+    position: relative;
+    height: 100%;
+}
+
+.letters-display{
+    position: relative;
+    z-index: 100;
+    display: flex;
+    flex-direction: row;
+    height: 100%;
+    justify-content: flex-start;
+    align-items: center;
+    padding-left: 4rem;
+}
+
+.letters-display span{
+    text-transform: uppercase;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+
+    margin: 0px 3rem 0px 0px;
+
+    width: 8rem;
+    aspect-ratio: 1/1;
+
+    border: solid 4px var(--second-blue);
+    background-color: black;
+    color: white;
+
+}
+
+.bg-bar-cont{
+    z-index: 0;
+    width: 100%;
+    height: 100%;
+    display: flex;
+    align-items: center;
+
+    position: absolute;
+    top: 0;
+    left: 0;
+}
+.bg-bar{
+    height: 0.5rem;
+    width: 100%;
+    background-color: var(--second-blue);
+}

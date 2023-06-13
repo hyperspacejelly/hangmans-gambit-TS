@@ -1,5 +1,7 @@
 import { useEffect, useState, useRef } from "react";
 
+import './CSS/countdown.css';
+
 interface Time {
     min: number,
     sec: number,
@@ -66,12 +68,10 @@ export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimer
     },[timerInit]);
 
     return(
-        <div style={{fontSize:'4rem'}}>
-        {`
-        ${msToTime(timeLeft).min<10?"0":""}${msToTime(timeLeft).min}:
-        ${msToTime(timeLeft).sec<10?"0":""}${msToTime(timeLeft).sec}:
-        ${msToTime(timeLeft).ms < 100?"0":""}${msToTime(timeLeft).ms < 10?"0":""}${msToTime(timeLeft).ms}
-        `}
+        <div id="countdown">
+                {`${msToTime(timeLeft).min<10?"0":""}${msToTime(timeLeft).min}:`+
+                `${msToTime(timeLeft).sec<10?"0":""}${msToTime(timeLeft).sec}:`+
+                `${msToTime(timeLeft).ms < 100?"0":""}${msToTime(timeLeft).ms < 10?"0":""}${msToTime(timeLeft).ms}`}
         </div>
     );
 }
