@@ -7,17 +7,47 @@
 }
 
 #play-area{
+    position: relative;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     border: 2px solid var(--second-blue);
     width: 40vw;
     height: 80%;
 }
 
 .letter-guess{
-    color: white;
+    position: absolute;
 
-    font-size: 4rem;
+    display: flex;
+    justify-content: center;
+    align-items: center;
 
     user-select: none;
-
     cursor: pointer;
+   
+    color: white;
+    text-transform: uppercase;
+    line-height: 0;
+
+    padding: 4.5rem;
+    width: 4rem;
+    height: 4rem;
+    font-size: 6rem;
+    border-radius: 100%;
+
+    transition: transform 0.5s ease-in-out;
+}
+
+.hp-1{
+    background-color: rgb(192, 156, 50, 0.5);
+}
+.hp-2{
+    background-color: rgba(55, 192, 50, 0.5);
+}
+.hp-3{
+    background-color: rgba(168, 50, 192, 0.5);
+}
+.hp-4{
+    background-color: rgba(192, 50, 74, 0.5);
 }

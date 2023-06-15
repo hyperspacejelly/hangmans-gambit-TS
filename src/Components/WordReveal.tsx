@@ -1,17 +1,22 @@
-import { letterToFind } from "../App";
+import { LetterToFind } from "../App";
 import './CSS/wordreveal.css'
 
 type WordRevealProps = {
-    wordToFind:  letterToFind[]
+    wordToFind:  LetterToFind[],
+    currGuess: number
 };
 
-function WordReveal({wordToFind} :WordRevealProps){
+function WordReveal({wordToFind, currGuess} :WordRevealProps){
 
     function renderWordToFind(){
         let i = 0;
         return wordToFind.map(letter=>{
             i++;
-            return(<span key={"word"+i} className={letter.hidden?"letter-hidden":"letter-displayed"}>
+            return(<span key={"word"+i} 
+                className={
+                    i===(currGuess+1)?"current-guess ":""
+                    +
+                    letter.hidden?"letter-hidden":"letter-displayed"}>
                 {letter.hidden?"?":letter.letter}</span>)
         })
     }

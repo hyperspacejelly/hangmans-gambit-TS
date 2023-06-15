@@ -1,4 +1,4 @@
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { TimerComponent } from "./Components/Timer"
 import Healthbar from "./Components/Healthbar";
 
@@ -22,7 +22,7 @@ interface settings {
 }
 
 // the word to guess will be constituted of an array of letters (visible or not)
-export type letterToFind = {
+export type LetterToFind = {
   hidden :boolean;
   letter :string;
 }
@@ -48,12 +48,11 @@ function genRandomNumberArray(arraySize :number, maxNumber :number) :number[]{
   return returnArray;
 }
 
-function createWordToFindArray(word :string, hiddenLettersRatio :number) :letterToFind[]{
+function createWordToFindArray(word :string, hiddenLettersRatio :number) :LetterToFind[]{
   const hiddenLetters = genRandomNumberArray(Math.floor(word.length * hiddenLettersRatio), (word.length));
-  let returnArray :Array<letterToFind> = [];
+  let returnArray :Array<LetterToFind> = [];
   console.log(hiddenLetters);
   for(let i=0;i<word.length;i++){
-    console.log("i : "+i+". hiddenletters[i]: "+hiddenLetters.includes(i));
     returnArray.push({
       hidden: hiddenLetters.includes(i)?true:false,
       letter:word.split('')[i]
@@ -61,6 +60,11 @@ function createWordToFindArray(word :string, hiddenLettersRatio :number) :letter
   }
 
   return returnArray;
+}
+
+function getFirstHiddenLetter(wordToFindArray :LetterToFind[]) :number{
+  console.log(wordToFindArray.findIndex((el)=>el.hidden))
+  return wordToFindArray.findIndex((el)=>el.hidden);
 }
 
 function App() {
@@ -73,8 +77,15 @@ function App() {
   const [timerComplete, setTimerComplete] = useState<boolean>(false);
 
   const [hp, setHp] = useState(settings.difficulty.easy.hp);
-  const [wordToFindArray, setWordToFindArray] = useState<letterToFind[]>([]);
+  const [wordToFindArray, setWordToFindArray] = useState<LetterToFind[]>([]);
   const [wordToFind, setWordToFind] = useState<string>("");
+
+  const [currGuessIndex, setCurrGuessIndex] = useState<number>(0);
+
+  useEffect(()=>{
+    if(wordToFindArray)
+      setCurrGuessIndex(getFirstHiddenLetter(wordToFindArray));
+  },[wordToFindArray]);
 
   // sets difficulty and generates an array with the right amount of hidden letters
   function handleDifficultySelect(difficulty :difficulties){
@@ -86,6 +97,7 @@ function App() {
 
     setWordToFind(word);
     setWordToFindArray(wordToFindValue);
+    setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
   }
 
   // calculates the total time for the countdown based on difficulty and number of hidden letters
@@ -95,6 +107,13 @@ function App() {
       returnValue = Math.ceil(wordToFind.length * (1 - difficultySettings.hiddenLettersRatio)) * (difficultySettings.totalTimeRatio * settings.baseTimePerLetterMs);
     }
     return returnValue;
+  }
+
+  //fct to execute if the current letter to guess has been guessed
+  function handleGuess() :void{
+    setWordToFindArray(prevArray => prevArray.map((letter, index)=>{
+      return index===currGuessIndex? {hidden:false, letter: letter.letter} : letter
+    }));
   }
 
   return (
@@ -108,6 +127,9 @@ function App() {
                     setTimerComplete={setTimerComplete} 
                     setTimerStart={setTimerStart} />
               <Healthbar hp={hp} />
+              <button style={{gridColumn:"1/span2"}}onClick={()=>{
+                setTimerStart(prev=>!prev);
+              }}>{timerStart?"Stop":"Start"} Timer</button>
             </div>
             <p>{timerComplete? "Countdown Over":""}</p>
           </section>
@@ -115,13 +137,10 @@ function App() {
             <LettersLeft wordToFindArray={wordToFindArray} />
           </section>
           <section id="center">
-            <button style={{gridColumn:"1/span2"}}onClick={()=>{
-                setTimerStart(prev=>!prev);
-              }}>{timerStart?"Stop":"Start"} Timer</button>
-            <PlayArea wordToFindArray={wordToFindArray} />
+            <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={()=>handleGuess()}/>
           </section>
           <section id="bottom">
-            <WordReveal wordToFind={wordToFindArray} />
+            <WordReveal wordToFind={wordToFindArray} currGuess={currGuessIndex}/>
           </section>
         </div>
       </>}
