@@ -1,112 +1,177 @@
 import './CSS/playarea.css';
 
 import { LetterToFind } from '../App'; 
-import { useEffect, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
-const vowels :string[] = ["a","e","i","o","u","y"];
-const consonants :string[]= ["b","c","d","f","g","h","j","k","l","m","n","p","q","r","s","t","v","w","x","z"];
 const gunshot = new Audio('/assets/gunshot2.ogg');
 const emptyGunshot = new Audio('/assets/emptyGunshot.ogg');
+const maxLettersOnScreen = 6;
 
+type LetterGuess = {
+    id :number,
+    letter :string,
+    hp :number,
+    angle :number,
+    speed :number,
+}
 
 type LetterGuessProps = {
-    offset? :number,
-    direction? : "default"|"inverse",
-    hp :number,
-    letter :string,
-    handleGuess? :()=>void,
-    ID :number
+    letterGuess :LetterGuess,
+    updateLetterGuesses :(updatedLetter :LetterGuess, param :updateParams)=>void,
+    handleGuess: ()=>void,
+    playArea: null | HTMLDivElement
 }
+
+type updateParams = 'update' | 'destroy';
 
 function genID() :number{
     return Math.floor(Math.random()*1000);
 }
 
-function LetterGuessComponent({offset = 2, direction = "default", hp, letter, handleGuess, ID} :LetterGuessProps) {
+function randomPercent() :number{
+    return Math.floor(Math.random() * 100);
+}
+
+function randomRadiansAngle() :number{
+    return (Math.floor(Math.random() * 359)) * (Math.PI / 180);
+}
+
+function randomLetter(exclude :string) :string{
+    // if excluded letter is Capital get its corresponding small letter UTF code 
+    let excludedLetterCode = exclude.charCodeAt(0) < 91 ? exclude.charCodeAt(0) : exclude.charCodeAt(0) + 32; 
+
+    let returnLetter = 0;
+    do{
+        returnLetter = 97 + Math.floor(Math.random() * 26);
+    }while(returnLetter === excludedLetterCode);
+
+    return String.fromCharCode(returnLetter);
+}
+
+//This function will  generate a random letter witha  change of being the current one to guess
+function genRandomLetterGuess(letter :string) :LetterGuess{
+    const randomCutoff = 30;
+
+    if(randomPercent() > randomCutoff){
+        return {
+            id :genID(),
+            letter: randomLetter(letter), 
+            hp: randomPercent() > 49 ? 1 : 2,
+            angle: randomRadiansAngle(),
+            speed: 1.3 + (Math.random()*2),
+        }
+    }
+
+    return {
+        id :genID(),
+        letter: letter,
+        hp: randomPercent() > 49 ? 1 : 2,
+        angle: randomRadiansAngle(),
+        speed: 1 + (Math.random()*2),
+    }
+}
+
+function LetterGuessComponent({letterGuess, updateLetterGuesses, handleGuess, playArea} :LetterGuessProps) {
     const [coorX, setCoorX] = useState<number>(0);
     const [coorY, setCoorY] = useState<number>(0);
-    const [angle, setAngle] = useState<number>(0);
-    const dirNum = direction === "default" ? 1 : -1;
-    const [letterHP, setLetterHP] = useState<number>(hp);
+    const [distance, setDistance] = useState<number>(1);
+    const intervalMov = useRef<number>();
 
-    //setup 
-    useEffect(()=>{
-        const updateAngleInterval = setInterval(()=>{
-            setAngle(prev => 
-                        (prev + (prev > 0?(0.01 * (1/prev)) : 0.005))
-                    );
-        }, 100);
-        console.log(ID);
-        return ()=>clearInterval(updateAngleInterval);
-    }, []);
+    const areaHeight = playArea?.getBoundingClientRect().height;
+    const areaWidth = playArea?.getBoundingClientRect().width;
 
     useEffect(()=>{
-        const updateDisplay = setInterval(()=>{
-            const angleToRadian = dirNum * angle * (180 / Math.PI);
-            const newX = angleToRadian * offset *  Math.cos(angleToRadian);
-            const newY = angleToRadian * offset * Math.sin(angleToRadian);
-            setCoorX(newX);
-            setCoorY(newY);
-            // console.log({angle: angle});
-        }, 100);
+        intervalMov.current = setInterval(()=>{
+            if(areaHeight && areaWidth){
+                if(Math.abs(coorX) >= areaWidth/2 || Math.abs(coorY) >= areaHeight/2){
+                    console.log('reached bounds');
+                    updateLetterGuesses(letterGuess, 'destroy');
+                }
+                else{
+                    setDistance(prev => prev+(letterGuess.speed));
+                    setCoorX(Math.cos(letterGuess.angle)*distance);
+                    setCoorY(Math.sin(letterGuess.angle)*distance);
+                }
+            }
+        }, 30); 
 
-        if(angle > 3.5){
-            clearInterval(updateDisplay);
+        return ()=>{
+            clearInterval(intervalMov.current);
         }
-
-        return ()=>{clearInterval(updateDisplay)}
-    },[angle]);
-
+    },[distance, coorX, coorY])
+    
     function handleClick(e :React.MouseEvent<HTMLDivElement>){
         e.stopPropagation();
         gunshot.currentTime=0;
         gunshot.play();
-        if(letterHP > 1){
-            setLetterHP(curr=>curr-1);
+        if(letterGuess.hp > 1){
+            updateLetterGuesses({
+                ...letterGuess,
+                hp: letterGuess.hp-1
+            }, 'update');
         }
-        if(letterHP === 1){
-            if(handleGuess)
-                handleGuess();
+        if(letterGuess.hp === 1){
+            handleGuess();
+            updateLetterGuesses(letterGuess, 'destroy');
         }
     }
 
     return( 
     <div 
         onClick={handleClick}
-        style={{transform: `translate(${coorX}px, ${coorY}px)`}} 
-        key={ID} 
-        className={`letter-guess hp-${letterHP}`}>
-            {letter}
+        style={{left: `${coorX}px`, top:`${coorY}px`}} 
+        key={letterGuess.id} 
+        className={`letter-guess hp-${letterGuess.hp}`}>
+            {letterGuess.letter}
     </div>);
-}
-
-
-function genLetterGuesses(letter :string, handleGuess :()=>void) :JSX.Element[]{
-    let returnArray :JSX.Element[] = [];
-   
-    returnArray.push(<LetterGuessComponent letter={letter} hp={2} handleGuess={handleGuess} ID={genID()} />);
-    // returnArray.push(<LetterGuessComponent letter={"h"} hp={3} direction='inverse' />);
-
-    return returnArray;
 }
 
 type PlayAreaProps = {
     wordToFindArray :LetterToFind[],
     currGuess :number,
-    handleGuess: ()=>void
+    handleGuess: (value :'correct' | 'incorrect')=>void
 }
 
 function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
-    const [letterGuess, setLetterGuess] = useState<JSX.Element[]>();
-    const [letterGuessDisplay, setLetterGuessDisplay] = useState<JSX.Element[]>()
+    const [letterGuesses, setLetterGuesses] = useState<LetterGuess[]>([]);
+
+    const refLoop = useRef<number>();
+    const refPlayArea = useRef<HTMLDivElement>(null)
+
 
     useEffect(()=>{
-        setLetterGuess(undefined)
         if(wordToFindArray[currGuess]){
-            setLetterGuess(genLetterGuesses(wordToFindArray[currGuess].letter, handleGuess));
+            if(letterGuesses[0] === undefined){
+                const newLetterGuess = genRandomLetterGuess(wordToFindArray[currGuess].letter);
+                setLetterGuesses([...letterGuesses, newLetterGuess])
+            }
+            refLoop.current=setInterval(()=>{
+                const newLetterGuess = genRandomLetterGuess(wordToFindArray[currGuess].letter);
+                if(letterGuesses.length<maxLettersOnScreen){
+                    setLetterGuesses([...letterGuesses, newLetterGuess]);
+                }else{
+                    updateLetterGuesses(letterGuesses[0], 'destroy');
+                }
+            }, 2000);
         }
-    },[currGuess]);
+        return ()=>{if(refLoop.current){clearInterval(refLoop.current);}}
+    },[currGuess, letterGuesses]);
 
+    function updateLetterGuesses(updatedLetter :LetterGuess, param :updateParams) :void{
+        if(letterGuesses){
+            if(param === 'update'){
+                setLetterGuesses(letterGuesses.map((letter)=>{
+                    if(letter.id === updatedLetter.id){
+                        return updatedLetter;
+                    }
+                    return letter;
+                }));
+            }
+            else if(param === "destroy"){
+                setLetterGuesses(letterGuesses.filter((letter)=>letter.id!==updatedLetter.id));
+            }
+        }
+    }
 
     function handleClick(){
         emptyGunshot.currentTime=0;
@@ -114,8 +179,24 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
     }
 
     return<div id="play-area-cont">
-        <div id="play-area" onClick={handleClick}>
-            {letterGuess && letterGuess}
+        <div id="play-area" onClick={handleClick} ref={refPlayArea}>
+            <div id="spawn-area">
+                {letterGuesses && letterGuesses.map((letter)=>{
+                    const isCorrect = letter.letter === wordToFindArray[currGuess].letter;
+                    return <LetterGuessComponent 
+                        key={letter.id}
+                        letterGuess={letter} 
+                        handleGuess={()=>handleGuess(isCorrect? 'correct': 'incorrect')} 
+                        updateLetterGuesses={updateLetterGuesses}
+                        playArea={refPlayArea.current}
+                        />
+                })}
+                {/* <LetterGuessComponent key={testLetter.id} letterGuess={testLetter} 
+                    handleGuess={
+                        ()=>{ handleGuess(testLetter.letter === wordToFindArray[currGuess].letter?'correct': 'incorrect')}} 
+                        updateLetterGuesses={updateLetterGuesses}
+                        /> */}
+            </div>
         </div>
     </div>
 }

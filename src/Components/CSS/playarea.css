@@ -12,8 +12,25 @@
     justify-content: center;
     align-items: center;
     border: 2px solid var(--second-blue);
-    width: 40vw;
-    height: 80%;
+    height: 100%;
+    aspect-ratio: 1/1;
+}
+
+#spawn-area{
+    position: relative;
+    border: solid white 2px;
+    width: 4rem;
+    height: 4rem;
+    padding: 4.5rem;
+}
+
+@keyframes shrinkGrowAnim {
+    0%{
+        transform: scale(90%);
+    }
+    100%{
+        transform: scale(110%);
+    }
 }
 
 .letter-guess{
@@ -37,6 +54,12 @@
     border-radius: 100%;
 
     transition: transform 0.5s ease-in-out;
+
+    animation-name: shrinkGrowAnim;
+    animation-duration: 0.5s;
+    animation-iteration-count: infinite;
+    animation-direction: alternate;
+    animation-timing-function: ease-in-out;
 }
 
 .hp-1{

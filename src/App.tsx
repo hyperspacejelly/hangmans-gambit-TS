@@ -83,8 +83,15 @@ function App() {
   const [currGuessIndex, setCurrGuessIndex] = useState<number>(0);
 
   useEffect(()=>{
-    if(wordToFindArray)
-      setCurrGuessIndex(getFirstHiddenLetter(wordToFindArray));
+    if(wordToFindArray){
+      const index = getFirstHiddenLetter(wordToFindArray);
+      if(index >= 0){
+        setCurrGuessIndex(getFirstHiddenLetter(wordToFindArray));
+      }
+      else{
+        //all letters have been guessed
+      }
+    }
   },[wordToFindArray]);
 
   // sets difficulty and generates an array with the right amount of hidden letters
@@ -110,10 +117,15 @@ function App() {
   }
 
   //fct to execute if the current letter to guess has been guessed
-  function handleGuess() :void{
-    setWordToFindArray(prevArray => prevArray.map((letter, index)=>{
-      return index===currGuessIndex? {hidden:false, letter: letter.letter} : letter
-    }));
+  function handleGuess(value :'correct' | 'incorrect') :void{
+    if(value==="correct"){
+      setWordToFindArray(prevArray => prevArray.map((letter, index)=>{
+        return index===currGuessIndex? {hidden:false, letter: letter.letter} : letter
+      }));
+    }
+    else if(value==="incorrect"){
+      setHp(hp=>hp-1);
+    }
   }
 
   return (
@@ -137,7 +149,7 @@ function App() {
             <LettersLeft wordToFindArray={wordToFindArray} />
           </section>
           <section id="center">
-            <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={()=>handleGuess()}/>
+            <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={handleGuess}/>
           </section>
           <section id="bottom">
             <WordReveal wordToFind={wordToFindArray} currGuess={currGuessIndex}/>
