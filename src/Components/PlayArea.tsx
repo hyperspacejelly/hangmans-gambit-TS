@@ -58,7 +58,7 @@ function genRandomLetterGuess(letter :string) :LetterGuess{
             letter: randomLetter(letter), 
             hp: randomPercent() > 49 ? 1 : 2,
             angle: randomRadiansAngle(),
-            speed: 1.3 + (Math.random()*2),
+            speed: 1.2 + (Math.random()*1.7),
         }
     }
 
@@ -67,7 +67,7 @@ function genRandomLetterGuess(letter :string) :LetterGuess{
         letter: letter,
         hp: randomPercent() > 49 ? 1 : 2,
         angle: randomRadiansAngle(),
-        speed: 1 + (Math.random()*2),
+        speed: 1.2 + (Math.random()*1.7),
     }
 }
 
@@ -168,7 +168,13 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
                 }));
             }
             else if(param === "destroy"){
-                setLetterGuesses(letterGuesses.filter((letter)=>letter.id!==updatedLetter.id));
+                const newLetterGuess = genRandomLetterGuess(wordToFindArray[currGuess].letter);
+                const filteredLetterGuesses = letterGuesses.filter((letter)=>letter.id!==updatedLetter.id);
+                if(filteredLetterGuesses.length < maxLettersOnScreen){
+                    setLetterGuesses([...filteredLetterGuesses, newLetterGuess]);
+                }else{
+                    setLetterGuesses(filteredLetterGuesses);
+                }
             }
         }
     }

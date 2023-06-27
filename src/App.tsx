@@ -10,11 +10,15 @@ import WordReveal from "./Components/WordReveal";
 import LettersLeft from "./Components/LettersLeft";
 import PlayArea from "./Components/PlayArea";
 
+import { SplashInit, SplashLose, SplashWin } from "./Components/SplashComponents";
+
 type difficultySettings = {
   hp :number,
   hiddenLettersRatio :number,
   totalTimeRatio :number
 }
+
+type GameStatus = "won" | "lost" | "playing" | "init";
 
 interface settings {
   baseTimePerLetterMs :number,
@@ -51,7 +55,6 @@ function genRandomNumberArray(arraySize :number, maxNumber :number) :number[]{
 function createWordToFindArray(word :string, hiddenLettersRatio :number) :LetterToFind[]{
   const hiddenLetters = genRandomNumberArray(Math.floor(word.length * hiddenLettersRatio), (word.length));
   let returnArray :Array<LetterToFind> = [];
-  console.log(hiddenLetters);
   for(let i=0;i<word.length;i++){
     returnArray.push({
       hidden: hiddenLetters.includes(i)?true:false,
@@ -80,19 +83,41 @@ function App() {
   const [wordToFindArray, setWordToFindArray] = useState<LetterToFind[]>([]);
   const [wordToFind, setWordToFind] = useState<string>("");
 
+  const [gameStatus, setGameStatus] = useState<GameStatus>("init");
+
   const [currGuessIndex, setCurrGuessIndex] = useState<number>(0);
 
   useEffect(()=>{
     if(wordToFindArray){
       const index = getFirstHiddenLetter(wordToFindArray);
-      if(index >= 0){
-        setCurrGuessIndex(getFirstHiddenLetter(wordToFindArray));
-      }
-      else{
-        //all letters have been guessed
+      setCurrGuessIndex(index); // finds the next hidden letter
+      
+      if(index < 0){
+        if(gameStatus === "playing"){
+          setGameStatus("won"); //win condition acheived
+          setTimerStart(false);
+        }
       }
     }
-  },[wordToFindArray]);
+  },[wordToFindArray, gameStatus]);
+
+  //Checks loss conditions
+  useEffect(()=>{
+    if(timerComplete || hp === 0){
+      setGameStatus("lost");
+      if(!timerComplete){
+        setTimerStart(false);
+      }
+    }
+  },[hp, timerComplete]);
+
+  useEffect(()=>{
+    console.log(gameStatus);
+    // when game starts, start timer
+    if(gameStatus === "playing"){
+      setTimerStart(true);
+    }
+  },[gameStatus]);
 
   // sets difficulty and generates an array with the right amount of hidden letters
   function handleDifficultySelect(difficulty :difficulties){
@@ -105,6 +130,8 @@ function App() {
     setWordToFind(word);
     setWordToFindArray(wordToFindValue);
     setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
+
+    setTimeout(()=>{setGameStatus("playing")},2000);
   }
 
   // calculates the total time for the countdown based on difficulty and number of hidden letters
@@ -139,9 +166,6 @@ function App() {
                     setTimerComplete={setTimerComplete} 
                     setTimerStart={setTimerStart} />
               <Healthbar hp={hp} />
-              <button style={{gridColumn:"1/span2"}}onClick={()=>{
-                setTimerStart(prev=>!prev);
-              }}>{timerStart?"Stop":"Start"} Timer</button>
             </div>
             <p>{timerComplete? "Countdown Over":""}</p>
           </section>
@@ -149,14 +173,18 @@ function App() {
             <LettersLeft wordToFindArray={wordToFindArray} />
           </section>
           <section id="center">
-            <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={handleGuess}/>
+            {(gameStatus==="playing") && 
+              <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={handleGuess}/>}
+            
+            {(gameStatus==="won") && <SplashWin />}
+            {(gameStatus==="lost") && <SplashLose />}
+            {(gameStatus==="init") && <SplashInit />}
           </section>
           <section id="bottom">
             <WordReveal wordToFind={wordToFindArray} currGuess={currGuessIndex}/>
           </section>
         </div>
       </>}
-
       {!difficultySettings &&<div id="diff-select-cont">
           <DifficultySelect setDifficulty={handleDifficultySelect}/>
         </div>
