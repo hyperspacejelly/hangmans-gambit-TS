@@ -8,7 +8,8 @@
 
   --main-blue: #006fed;
   --second-blue: #00c7ff;
-  --main-pink: #efbfed;
+  --main-pink: rgb(239, 191, 237);
+  --main-pink-transp: rgb(239, 191, 237, 0.6);
 }
 
 :root{

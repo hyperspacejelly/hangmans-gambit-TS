@@ -2,7 +2,7 @@ import './CSS/splashes.css';
 
 export function SplashInit(){
     return <div className="splash-cont">
-        <div className='splash-base splash-fade-in'>
+        <div className='splash-base splash-fade-in-out'>
             <h2>
                 Let's Start!
             </h2>

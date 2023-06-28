@@ -196,11 +196,6 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
                         playArea={refPlayArea.current}
                         />
                 })}
-                {/* <LetterGuessComponent key={testLetter.id} letterGuess={testLetter} 
-                    handleGuess={
-                        ()=>{ handleGuess(testLetter.letter === wordToFindArray[currGuess].letter?'correct': 'incorrect')}} 
-                        updateLetterGuesses={updateLetterGuesses}
-                        /> */}
             </div>
         </div>
     </div>

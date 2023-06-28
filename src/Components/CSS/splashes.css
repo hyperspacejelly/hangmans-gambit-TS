@@ -21,6 +21,16 @@
     animation: splashIn 0.5s ease-out 0s 1;
 }
 
+.splash-fade-in-out{
+    animation: splashIn 0.5s ease-out 0s 1, splashOut 0.5s ease-in 1.9s 1 forwards;
+}
+
+.splash-fade-out{
+    animation: splashOut 0.5s ease-out 0s 1;
+}
+
+
+
 .splash-txt-wiggle{
     animation: textShake 200ms linear infinite alternate;
 }
@@ -84,6 +94,15 @@
     }
     100%{
         transform: translateX(0%);
+    }
+}
+
+@keyframes splashOut {
+    0%{
+        transform: translateX(0%);
+    }
+    100%{
+        transform: translateX(-100%);
     }
 }
 

@@ -137,7 +137,7 @@ function App() {
     setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
 
     BGM.play();
-    setTimeout(()=>{setGameStatus("playing")},2000);
+    setTimeout(()=>{setGameStatus("playing")},2500);
   }
 
   // calculates the total time for the countdown based on difficulty and number of hidden letters
