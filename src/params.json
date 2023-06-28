@@ -1,18 +1,18 @@
 {
-    "baseTimePerLetterMs":40000,
+    "baseTimePerLetterMs":22000,
     "difficulty":{
         "easy":{
-            "hp": 6,
+            "hp": 4,
             "hiddenLettersRatio": 0.5,
             "totalTimeRatio": 1.2
         },
         "normal":{
-            "hp": 5,
+            "hp": 3,
             "hiddenLettersRatio": 0.6,
             "totalTimeRatio": 1
         },
         "hard":{
-            "hp": 5,
+            "hp": 3,
             "hiddenLettersRatio": 0.7,
             "totalTimeRatio": 0.8
         }

@@ -25,7 +25,7 @@ type LetterGuessProps = {
 type updateParams = 'update' | 'destroy';
 
 function genID() :number{
-    return Math.floor(Math.random()*1000);
+    return Math.floor(Math.random()*100000);
 }
 
 function randomPercent() :number{
@@ -84,7 +84,6 @@ function LetterGuessComponent({letterGuess, updateLetterGuesses, handleGuess, pl
         intervalMov.current = setInterval(()=>{
             if(areaHeight && areaWidth){
                 if(Math.abs(coorX) >= areaWidth/2 || Math.abs(coorY) >= areaHeight/2){
-                    console.log('reached bounds');
                     updateLetterGuesses(letterGuess, 'destroy');
                 }
                 else{

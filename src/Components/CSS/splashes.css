@@ -7,18 +7,31 @@
     border-top: 4px solid white;
     border-bottom: 4px solid white;
 
-    animation: splashOn 0.5s ease-out 0s 1;
 
     display: flex;
     justify-content: center;
     align-items: center;
+
+    flex-direction: column;
+
+    user-select: none;
+}
+
+.splash-fade-in{
+    animation: splashIn 0.5s ease-out 0s 1;
+}
+
+.splash-txt-wiggle{
+    animation: textShake 200ms linear infinite alternate;
 }
 
 .splash-base h2{
-    user-select: none;
+    flex-grow: 2;
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-size: clamp(6rem, 10vw, 8rem);
     text-transform: uppercase;
-    animation: textShake 100ms linear infinite alternate;
 }
 
 .splash-cont{
@@ -31,7 +44,41 @@
     overflow: hidden;
 }
 
-@keyframes splashOn {
+.splash-buttons{
+    text-shadow: 0px 0px 1px black;
+    display: flex;
+    flex-direction: row;
+    width: fit-content;
+    column-gap: 2vw;
+
+    padding-bottom: 3rem;
+
+    width: max-content;
+}
+
+.splash-buttons button{
+    all:unset;
+
+    cursor: pointer;
+    font-size: clamp(2rem, 2vw, 3rem);
+
+    color: white;
+    border: 2px solid white;
+
+    padding: 1rem;
+
+}
+
+.splash-buttons button:hover{
+    background-color: white; 
+    color: var(--main-blue);
+}
+
+#difficulty-select{
+    height: 30vh;
+}
+
+@keyframes splashIn {
     0%{
         transform: translateX(100%);
     }
@@ -42,9 +89,9 @@
 
 @keyframes textShake {
     0%{
-        transform: rotate(1deg);
+        transform: scale(100%);
     }
     100%{
-        transform: rotate(-1deg);
+        transform: scale(105%);
     }
 }

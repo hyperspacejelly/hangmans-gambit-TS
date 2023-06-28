@@ -4,7 +4,7 @@
     height: fit-content;
     padding: 4rem 8rem;
 
-    background-color: var(--second-blue);
+    background-color: var(--main-blue);
 
     color:  white;
     text-shadow: 0px 0px 4px black;
@@ -17,4 +17,9 @@
 
 .diff-select section:nth-child(1){
     margin-bottom: 4rem;
+}
+
+.diff-select h2{
+    font-size: clamp(4rem, 10vw, 8rem);
+    text-transform: uppercase;
 }

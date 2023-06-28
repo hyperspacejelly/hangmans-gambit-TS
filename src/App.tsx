@@ -12,6 +12,12 @@ import PlayArea from "./Components/PlayArea";
 
 import { SplashInit, SplashLose, SplashWin } from "./Components/SplashComponents";
 
+import { coolSfx, failSfx, gameOverSfx, playRandomSfx, winSfx } from "./audio";
+
+const BGM = new Audio('/assets/hangman.ogg');
+BGM.loop = true;
+BGM.volume= 1;
+
 type difficultySettings = {
   hp :number,
   hiddenLettersRatio :number,
@@ -66,7 +72,6 @@ function createWordToFindArray(word :string, hiddenLettersRatio :number) :Letter
 }
 
 function getFirstHiddenLetter(wordToFindArray :LetterToFind[]) :number{
-  console.log(wordToFindArray.findIndex((el)=>el.hidden))
   return wordToFindArray.findIndex((el)=>el.hidden);
 }
 
@@ -105,6 +110,7 @@ function App() {
   useEffect(()=>{
     if(timerComplete || hp === 0){
       setGameStatus("lost");
+      gameOverSfx.play();
       if(!timerComplete){
         setTimerStart(false);
       }
@@ -112,7 +118,6 @@ function App() {
   },[hp, timerComplete]);
 
   useEffect(()=>{
-    console.log(gameStatus);
     // when game starts, start timer
     if(gameStatus === "playing"){
       setTimerStart(true);
@@ -131,6 +136,7 @@ function App() {
     setWordToFindArray(wordToFindValue);
     setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
 
+    BGM.play();
     setTimeout(()=>{setGameStatus("playing")},2000);
   }
 
@@ -149,9 +155,19 @@ function App() {
       setWordToFindArray(prevArray => prevArray.map((letter, index)=>{
         return index===currGuessIndex? {hidden:false, letter: letter.letter} : letter
       }));
+      if(wordToFindArray.filter((el)=>el.hidden).length>1){
+        playRandomSfx(coolSfx);
+      }
+      else{
+        winSfx.currentTime=0;
+        winSfx.play();
+      }
     }
     else if(value==="incorrect"){
       setHp(hp=>hp-1);
+      if(hp>1){
+        playRandomSfx(failSfx);
+      }
     }
   }
 
@@ -175,7 +191,6 @@ function App() {
           <section id="center">
             {(gameStatus==="playing") && 
               <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={handleGuess}/>}
-            
             {(gameStatus==="won") && <SplashWin />}
             {(gameStatus==="lost") && <SplashLose />}
             {(gameStatus==="init") && <SplashInit />}

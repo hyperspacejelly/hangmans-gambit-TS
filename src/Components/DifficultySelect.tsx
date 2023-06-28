@@ -1,4 +1,5 @@
-import './CSS/diffselect.css';
+import './CSS/splashes.css';
+
 
 export type difficulties = "easy" | "normal" | "hard";
 
@@ -12,11 +13,9 @@ function DifficultySelect({setDifficulty} :DifficultySelectProps){
         setDifficulty(param);
     }
 
-    return <div className="diff-select">
-        <section>
-            <h2>Select a difficulty</h2>
-        </section>
-        <section>
+    return <div className="splash-base" id="difficulty-select">
+        <h2>Select a difficulty</h2>
+        <section className="splash-buttons">
             <button onClick={()=>handleClick("easy")}>Easy</button>
             <button onClick={()=>handleClick("normal")}>Normal</button>
             <button onClick={()=>handleClick("hard")}>Hard</button>
