@@ -84,7 +84,7 @@ function App() {
   // reflects whether the timer has run its full course or not 
   const [timerComplete, setTimerComplete] = useState<boolean>(false);
 
-  const [hp, setHp] = useState(settings.difficulty.easy.hp);
+  const [hp, setHp] = useState<number>(1);
   const [wordToFindArray, setWordToFindArray] = useState<LetterToFind[]>([]);
   const [wordToFind, setWordToFind] = useState<string>("");
 
@@ -132,6 +132,7 @@ function App() {
     const ratio = difficultyValue.hiddenLettersRatio;
     const wordToFindValue = createWordToFindArray(word, ratio);
 
+    setHp(difficultyValue.hp)
     setWordToFind(word);
     setWordToFindArray(wordToFindValue);
     setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
@@ -139,6 +140,22 @@ function App() {
     BGM.play();
     setTimeout(()=>{setGameStatus("playing")},2500);
   }
+
+  function newGameSetup(){
+    if(difficultySettings){
+      const word = getWord();
+      const ratio = difficultySettings.hiddenLettersRatio;
+      const wordToFindValue = createWordToFindArray(word, ratio);
+
+      setHp(difficultySettings.hp)
+      setWordToFind(word);
+      setWordToFindArray(wordToFindValue);
+      setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
+
+      setTimeout(()=>{setGameStatus("playing")},2500);
+    }
+  }
+
 
   // calculates the total time for the countdown based on difficulty and number of hidden letters
   function timerTotalTime() :number{
@@ -191,8 +208,14 @@ function App() {
           <section id="center">
             {(gameStatus==="playing") && 
               <PlayArea wordToFindArray={wordToFindArray} currGuess={currGuessIndex} handleGuess={handleGuess}/>}
-            {(gameStatus==="won") && <SplashWin />}
-            {(gameStatus==="lost") && <SplashLose />}
+            {(gameStatus==="won") && <SplashWin handleNewGame={()=>{
+              setGameStatus("init");
+              newGameSetup();
+            }} />}
+            {(gameStatus==="lost") && <SplashLose handleNewGame={()=>{
+              setGameStatus("init");
+              newGameSetup();
+            }}/>}
             {(gameStatus==="init") && <SplashInit />}
           </section>
           <section id="bottom">
