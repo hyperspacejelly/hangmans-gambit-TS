@@ -11,6 +11,7 @@ interface Time {
 type TimerProps = {
     timerTimeMs: number,
     timerStart: boolean,
+    timerCount: number,
     setTimerStart : React.Dispatch<React.SetStateAction<boolean>>,
     setTimerComplete: React.Dispatch<React.SetStateAction<boolean>>,
 }
@@ -28,12 +29,17 @@ function msToTime(valueMs :number) :Time{
     return returnTime
 }
 
-export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimerComplete} :TimerProps){
+export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimerComplete, timerCount} :TimerProps){
     const [timerInit, setTimerInit] = useState<number>(0);
     const [totalTimeLeft, setTotalTimeLeft] = useState<number>(timerTimeMs); 
     const [timeLeft, setTimeLeft] = useState<number>(timerTimeMs);
     const refreshInterval = useRef<number>();
-    const refreshRate = 1;   
+    const refreshRate = 1;  
+
+    useEffect(()=>{
+        setTotalTimeLeft(timerTimeMs);
+        setTimeLeft(timerTimeMs);
+    },[timerCount])
     
     useEffect(()=>{
         if(refreshInterval.current){

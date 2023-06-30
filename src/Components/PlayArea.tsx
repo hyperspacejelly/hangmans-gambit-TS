@@ -3,8 +3,8 @@ import './CSS/playarea.css';
 import { LetterToFind } from '../App'; 
 import { useEffect, useRef, useState } from 'react';
 
-const gunshot = new Audio('/assets/gunshot2.ogg');
-const emptyGunshot = new Audio('/assets/emptyGunshot.ogg');
+import { gunshot, emptyGunshot } from '../audio';
+
 const maxLettersOnScreen = 6;
 
 type LetterGuess = {

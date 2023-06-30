@@ -12,11 +12,8 @@ import PlayArea from "./Components/PlayArea";
 
 import { SplashInit, SplashLose, SplashWin } from "./Components/SplashComponents";
 
-import { coolSfx, failSfx, gameOverSfx, playRandomSfx, winSfx } from "./audio";
+import { BGM, coolSfx, failSfx, gameOverSfx, playRandomSfx, winSfx } from "./audio";
 
-const BGM = new Audio('/assets/hangman.ogg');
-BGM.loop = true;
-BGM.volume= 1;
 
 type difficultySettings = {
   hp :number,
@@ -78,6 +75,7 @@ function getFirstHiddenLetter(wordToFindArray :LetterToFind[]) :number{
 function App() {
   // stores difficulty settings chosen by player
   const [difficultySettings, setDifficultySettings] = useState<difficultySettings | null>(null);
+  const [gameCount, setGameCount] = useState<number>(1);
 
   // reflect whether the timer is running or not
   const [timerStart, setTimerStart] = useState<boolean>(false);
@@ -91,6 +89,8 @@ function App() {
   const [gameStatus, setGameStatus] = useState<GameStatus>("init");
 
   const [currGuessIndex, setCurrGuessIndex] = useState<number>(0);
+
+
 
   useEffect(()=>{
     if(wordToFindArray){
@@ -109,8 +109,16 @@ function App() {
   //Checks loss conditions
   useEffect(()=>{
     if(timerComplete || hp === 0){
-      setGameStatus("lost");
-      gameOverSfx.play();
+      if(gameStatus==="playing"){
+        console.log({
+          timerComplete: timerComplete,
+          hp: hp,
+          gameStatus: gameStatus
+        });
+
+        setGameStatus("lost");
+        gameOverSfx.play();
+      }
       if(!timerComplete){
         setTimerStart(false);
       }
@@ -143,6 +151,7 @@ function App() {
 
   function newGameSetup(){
     if(difficultySettings){
+      setGameCount(prev=>prev+1);
       const word = getWord();
       const ratio = difficultySettings.hiddenLettersRatio;
       const wordToFindValue = createWordToFindArray(word, ratio);
@@ -151,6 +160,7 @@ function App() {
       setWordToFind(word);
       setWordToFindArray(wordToFindValue);
       setCurrGuessIndex(getFirstHiddenLetter(wordToFindValue));
+      setTimerComplete(false);
 
       setTimeout(()=>{setGameStatus("playing")},2500);
     }
@@ -196,11 +206,12 @@ function App() {
             <div style={{width:'fit-content'}}>
               <TimerComponent timerTimeMs={timerTotalTime()} 
                     timerStart={timerStart} 
+                    timerCount={gameCount}
                     setTimerComplete={setTimerComplete} 
-                    setTimerStart={setTimerStart} />
+                    setTimerStart={setTimerStart} 
+                    />
               <Healthbar hp={hp} />
             </div>
-            <p>{timerComplete? "Countdown Over":""}</p>
           </section>
           <section id="top-left">
             <LettersLeft wordToFindArray={wordToFindArray} />

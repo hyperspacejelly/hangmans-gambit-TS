@@ -4,6 +4,8 @@
     align-items: flex-start;
     width: 100%;
     height: 100%;
+
+    
 }
 
 #play-area{
@@ -14,6 +16,8 @@
     /* border: 2px solid var(--second-blue); */
     height: 100%;
     aspect-ratio: 1/1;
+
+    cursor: url('/assets/img/crosshair-wide.png') 31 31, crosshair ;
 }
 
 #play-area::before{
@@ -38,6 +42,8 @@
 
     animation: shakeArea 0.8s linear infinite alternate, fadeIn 1s ease-out 1;
 }
+
+
 
 @keyframes shrinkGrowAnim {
     0%{
@@ -92,7 +98,7 @@
     align-items: center;
 
     user-select: none;
-    cursor: pointer;
+    cursor: url('/assets/img/crosshair.png') 31 31, crosshair ;
    
     color: white;
     text-transform: uppercase;

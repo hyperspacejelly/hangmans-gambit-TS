@@ -1,8 +1,8 @@
-import { letterToFind } from "../App";
+import { LetterToFind } from "../App";
 import './CSS/lettersleft.css';
 
 type LettersLeftProps = {
-    wordToFindArray :letterToFind[]
+    wordToFindArray :LetterToFind[]
 }
 
 function LettersLeft({wordToFindArray} :LettersLeftProps){
@@ -10,7 +10,7 @@ function LettersLeft({wordToFindArray} :LettersLeftProps){
 
     return<div id="letters-left">
         <h2 className="title">Letters Left</h2>
-        <h2 className="number">{numLetters}</h2>
+        <h2 className="number" key={"lettersLeft"+numLetters}>{numLetters}</h2>
     </div>
 }
 

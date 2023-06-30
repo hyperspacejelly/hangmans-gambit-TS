@@ -21,7 +21,15 @@ main{
   width: 100vw;
   height: 100vh;
 
-  background-color: #2b2473;
+  /* background-color: #2b2473; */
+
+  background-color: #040c3d;
+
+  /* background-image: url('/assets/img/BGHangman4.gif');
+  background-position: center;
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-blend-mode:multiply; */
 }
 
 #hangman-UI{
