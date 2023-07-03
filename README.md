@@ -12,7 +12,9 @@ Danganronpa has a gun motif running through most of its investigative minigames 
 
 ### Note 
 ```
-Since this clone of Hangman's gambit is devoid of narrative context, the word list is only composed of generic 'murder investigation' vocabulary (e.g. 'blood', 'victim', 'knife', etc);
+Since this clone of Hangman's gambit is devoid of narrative context, 
+the word list is only composed of generic 'murder investigation' vocabulary 
+(e.g. 'blood', 'victim', 'knife', etc);
 ```
 
 ## The UI
