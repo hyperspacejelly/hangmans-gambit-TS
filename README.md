@@ -41,6 +41,7 @@ All sound effects were found on [Freesound](https://www.freesound.org):
 - [Vocal samples by unfa](https://freesound.org/people/unfa/packs/9633/)
 - [Gunshot sound by fastson](https://freesound.org/people/fastson/sounds/50618/)
 - [Empty gunshot sound by KlawyKogut](https://freesound.org/people/KlawyKogut/sounds/154934/)
-- The background music and crosshair cursors my creations
+
+The background music and crosshair cursors my creations
 
 **Lucien Jély**
