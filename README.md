@@ -10,6 +10,8 @@ The player has to guess a word that is related the investigation and trial being
 
 Danganronpa has a gun motif running through most of its investigative minigames (like shooting 'evidence bullets' at contradictory statements by other characters). In the Hangman's Gambit, you have to shoot the right letter that you are currently trying to guess.
 
+![A screenshot of the minigame in Danganropa: Trigger Happy Havoc](./readme_media/dr1.png)
+
 ### Note 
 ```
 Since this clone of Hangman's gambit is devoid of narrative context, 
@@ -22,6 +24,8 @@ the word list is only composed of generic 'murder investigation' vocabulary
 - On the top right corner you will find a timer counting down and a number of hearts representing your Health Points.
 - At the center of the page is the area where letters will appear.
 - At the bottom of the page starting from the left is the word you need to guess with some letters hidden.
+
+![A screenshot of hangmans-gambit-TS](./readme_media/hangmans-gambit-TS.png)
 
 ## How to play hangmans-gambit-TS
 
