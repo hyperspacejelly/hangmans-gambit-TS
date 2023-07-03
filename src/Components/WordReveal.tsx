@@ -8,6 +8,7 @@ type WordRevealProps = {
 
 function WordReveal({wordToFind, currGuess} :WordRevealProps){
 
+    /* generates an array of JSX elements based on the current word and current index to guess */
     function renderWordToFind(){
         let i = 0;
 

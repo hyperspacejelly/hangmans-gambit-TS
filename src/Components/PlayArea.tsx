@@ -24,18 +24,22 @@ type LetterGuessProps = {
 
 type updateParams = 'update' | 'destroy';
 
+/* Generates random INT between 0 and 99,999 */
 function genID() :number{
     return Math.floor(Math.random()*100000);
 }
 
+/* Generates an INT between 0 and 100 */
 function randomPercent() :number{
     return Math.floor(Math.random() * 100);
 }
 
+/* Generates a random an angle in radians */
 function randomRadiansAngle() :number{
     return (Math.floor(Math.random() * 359)) * (Math.PI / 180);
 }
 
+/* Picks a random letter that is not {exclude} */
 function randomLetter(exclude :string) :string{
     // if excluded letter is Capital get its corresponding small letter UTF code 
     let excludedLetterCode = exclude.charCodeAt(0) < 91 ? exclude.charCodeAt(0) : exclude.charCodeAt(0) + 32; 
@@ -48,7 +52,7 @@ function randomLetter(exclude :string) :string{
     return String.fromCharCode(returnLetter);
 }
 
-//This function will  generate a random letter witha  change of being the current one to guess
+/* This function will  generate a random LetterGuess with a 30% change of it being the current one to guess */
 function genRandomLetterGuess(letter :string) :LetterGuess{
     const randomCutoff = 30;
 
@@ -84,12 +88,12 @@ function LetterGuessComponent({letterGuess, updateLetterGuesses, handleGuess, pl
         intervalMov.current = setInterval(()=>{
             if(areaHeight && areaWidth){
                 if(Math.abs(coorX) >= areaWidth/2 || Math.abs(coorY) >= areaHeight/2){
-                    updateLetterGuesses(letterGuess, 'destroy');
+                    updateLetterGuesses(letterGuess, 'destroy'); // if the letter has reached the bounds of the play area, destroy it
                 }
                 else{
-                    setDistance(prev => prev+(letterGuess.speed));
-                    setCoorX(Math.cos(letterGuess.angle)*distance);
-                    setCoorY(Math.sin(letterGuess.angle)*distance);
+                    setDistance(prev => prev+(letterGuess.speed)); // increment the distance by the {speed} value
+                    setCoorX(Math.cos(letterGuess.angle)*distance); // x = cos(angle) * distance
+                    setCoorY(Math.sin(letterGuess.angle)*distance); // y = sin(angle) * distance
                 }
             }
         }, 30); 
@@ -103,15 +107,16 @@ function LetterGuessComponent({letterGuess, updateLetterGuesses, handleGuess, pl
         e.stopPropagation();
         gunshot.currentTime=0;
         gunshot.play();
+
         if(letterGuess.hp > 1){
             updateLetterGuesses({
                 ...letterGuess,
                 hp: letterGuess.hp-1
-            }, 'update');
+            }, 'update'); // update letter with -1 hp
         }
         if(letterGuess.hp === 1){
-            handleGuess();
-            updateLetterGuesses(letterGuess, 'destroy');
+            handleGuess(); // if hp reaches 0, trigger function for correct or incorrect guess
+            updateLetterGuesses(letterGuess, 'destroy'); // destroy letter
         }
     }
 
@@ -135,10 +140,11 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
     const [letterGuesses, setLetterGuesses] = useState<LetterGuess[]>([]);
 
     const refLoop = useRef<number>();
-    const refPlayArea = useRef<HTMLDivElement>(null)
-
+    const refPlayArea = useRef<HTMLDivElement>(null);
 
     useEffect(()=>{
+
+        /* Generates a new letter on screen every 2 sec or everytime one is destroyed (max = maxLettersOnScreen) */
         if(wordToFindArray[currGuess]){
             if(letterGuesses[0] === undefined){
                 const newLetterGuess = genRandomLetterGuess(wordToFindArray[currGuess].letter);
@@ -156,6 +162,7 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
         return ()=>{if(refLoop.current){clearInterval(refLoop.current);}}
     },[currGuess, letterGuesses]);
 
+    /* Updates or destroys a letter on screen */
     function updateLetterGuesses(updatedLetter :LetterGuess, param :updateParams) :void{
         if(letterGuesses){
             if(param === 'update'){
@@ -178,6 +185,7 @@ function PlayArea({wordToFindArray, currGuess, handleGuess} :PlayAreaProps){
         }
     }
 
+    /* plays empty gunshot if click on play area but not on letter */
     function handleClick(){
         emptyGunshot.currentTime=0;
         emptyGunshot.play();

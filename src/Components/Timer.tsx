@@ -16,6 +16,7 @@ type TimerProps = {
     setTimerComplete: React.Dispatch<React.SetStateAction<boolean>>,
 }
 
+/* turns a value in ms into a Time object with {min, sec, ms} values */
 function msToTime(valueMs :number) :Time{
     let returnTime = {min:0,sec:0,ms:0}
     
@@ -36,6 +37,7 @@ export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimer
     const refreshInterval = useRef<number>();
     const refreshRate = 1;  
 
+    /* To reset the timer we wait on a counter value to increase (represents a new game) */
     useEffect(()=>{
         setTotalTimeLeft(timerTimeMs);
         setTimeLeft(timerTimeMs);
@@ -47,6 +49,7 @@ export function TimerComponent({timerTimeMs, timerStart, setTimerStart, setTimer
         }
     },[])
 
+    /* if the pause/play status of the timer changes */
     useEffect(()=>{
         if(timerStart){
             setTimerInit(Date.now()); //set references time for countdown

@@ -15,6 +15,7 @@ import { SplashInit, SplashLose, SplashWin } from "./Components/SplashComponents
 import { BGM, coolSfx, failSfx, gameOverSfx, playRandomSfx, winSfx } from "./audio";
 
 
+// game parameters loaded from params.json
 type difficultySettings = {
   hp :number,
   hiddenLettersRatio :number,
@@ -28,13 +29,14 @@ interface settings {
   difficultySettings :difficultySettings[]
 }
 
-// the word to guess will be constituted of an array of letters (visible or not)
+// the word to guess will be constituted of an array of letters that will be hidden or visible
 export type LetterToFind = {
   hidden :boolean;
   letter :string;
 }
 
 
+/* gets a random word from the imported word array*/
 function getWord() :string{
   const maxIndex = words.length;
   const randomIndex = Math.floor(Math.random() * maxIndex);
@@ -42,12 +44,14 @@ function getWord() :string{
   return words[randomIndex];
 }
 
-function genRandomNumberArray(arraySize :number, maxNumber :number) :number[]{
+/* Creates an array of {arraySize} DIFFERENT numbers each of which can have a max value of {maxValue} 
+  The purpose of this fct is to have a set of random indexes to hide in the LetterToFind array wordToFindArray */
+function genRandomNumberArray(arraySize :number, maxValue :number) :number[]{
   let returnArray :number[] = [];
   for(let i = 0; i < arraySize;i++){
     let randomNum: number = 0;
     do{
-      randomNum = Math.floor(Math.random() * maxNumber);
+      randomNum = Math.floor(Math.random() * maxValue);
     }while(returnArray.includes(randomNum));
 
     returnArray.push(randomNum)
@@ -55,6 +59,11 @@ function genRandomNumberArray(arraySize :number, maxNumber :number) :number[]{
   return returnArray;
 }
 
+/* Generates an array of LetterToFind from a string {word} and a ratio (0 to 1) of hidden letters {hiddenLettersRatio} 
+  each LetterToFind is comprised of 2 values: 
+    {hidden :boolean} which determines whether the letter is to guess (true) or visible (false)
+    {letter :string} which contains the letter
+*/
 function createWordToFindArray(word :string, hiddenLettersRatio :number) :LetterToFind[]{
   const hiddenLetters = genRandomNumberArray(Math.floor(word.length * hiddenLettersRatio), (word.length));
   let returnArray :Array<LetterToFind> = [];
@@ -68,6 +77,7 @@ function createWordToFindArray(word :string, hiddenLettersRatio :number) :Letter
   return returnArray;
 }
 
+/* Gets the index of the first LetterToFind with a {hidden} value of (true) */
 function getFirstHiddenLetter(wordToFindArray :LetterToFind[]) :number{
   return wordToFindArray.findIndex((el)=>el.hidden);
 }
@@ -75,10 +85,13 @@ function getFirstHiddenLetter(wordToFindArray :LetterToFind[]) :number{
 function App() {
   // stores difficulty settings chosen by player
   const [difficultySettings, setDifficultySettings] = useState<difficultySettings | null>(null);
+
+  //number of time the game has been started
   const [gameCount, setGameCount] = useState<number>(1);
 
   // reflect whether the timer is running or not
   const [timerStart, setTimerStart] = useState<boolean>(false);
+
   // reflects whether the timer has run its full course or not 
   const [timerComplete, setTimerComplete] = useState<boolean>(false);
 
@@ -89,8 +102,6 @@ function App() {
   const [gameStatus, setGameStatus] = useState<GameStatus>("init");
 
   const [currGuessIndex, setCurrGuessIndex] = useState<number>(0);
-
-
 
   useEffect(()=>{
     if(wordToFindArray){
@@ -106,21 +117,15 @@ function App() {
     }
   },[wordToFindArray, gameStatus]);
 
-  //Checks loss conditions
+  /* Checks loss conditions */
   useEffect(()=>{
     if(timerComplete || hp === 0){
       if(gameStatus==="playing"){
-        console.log({
-          timerComplete: timerComplete,
-          hp: hp,
-          gameStatus: gameStatus
-        });
-
         setGameStatus("lost");
         gameOverSfx.play();
       }
       if(!timerComplete){
-        setTimerStart(false);
+        setTimerStart(false); // of game over but the timer hasn't run out, pause it 
       }
     }
   },[hp, timerComplete]);
@@ -132,7 +137,7 @@ function App() {
     }
   },[gameStatus]);
 
-  // sets difficulty and generates an array with the right amount of hidden letters
+  /* sets difficulty and generates an array with the right amount of hidden letters */
   function handleDifficultySelect(difficulty :difficulties){
     const difficultyValue = (settings as any).difficulty[difficulty];
     setDifficultySettings(difficultyValue);
@@ -149,6 +154,7 @@ function App() {
     setTimeout(()=>{setGameStatus("playing")},2500);
   }
 
+  /* Resets for a new game with the same difficulty settings */
   function newGameSetup(){
     if(difficultySettings){
       setGameCount(prev=>prev+1);
@@ -167,7 +173,7 @@ function App() {
   }
 
 
-  // calculates the total time for the countdown based on difficulty and number of hidden letters
+  /* calculates the total time for the countdown based on difficulty and number of hidden letters */
   function timerTotalTime() :number{
     let returnValue :number = 0;
     if(difficultySettings && wordToFind){
@@ -176,24 +182,26 @@ function App() {
     return returnValue;
   }
 
-  //fct to execute if the current letter to guess has been guessed
+  /* fct to execute if the current letter to guess has been guessed */
   function handleGuess(value :'correct' | 'incorrect') :void{
     if(value==="correct"){
+      // turns the guessed letter visible
       setWordToFindArray(prevArray => prevArray.map((letter, index)=>{
         return index===currGuessIndex? {hidden:false, letter: letter.letter} : letter
       }));
+
       if(wordToFindArray.filter((el)=>el.hidden).length>1){
-        playRandomSfx(coolSfx);
+        playRandomSfx(coolSfx); // if != last letter to guess, play a success SFX
       }
       else{
         winSfx.currentTime=0;
-        winSfx.play();
+        winSfx.play(); // else play the game over (win) SFX
       }
     }
     else if(value==="incorrect"){
       setHp(hp=>hp-1);
       if(hp>1){
-        playRandomSfx(failSfx);
+        playRandomSfx(failSfx); // if wrong guess hp>1 play a fail SFX
       }
     }
   }

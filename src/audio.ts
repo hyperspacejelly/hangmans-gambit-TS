@@ -1,3 +1,5 @@
+/* Exports for all the audio assets used in the game */
+
 export const coolSfx = [
     new Audio('/assets/cool1.ogg'),
     new Audio('/assets/cool2.ogg'),
