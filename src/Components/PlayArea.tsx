@@ -8,7 +8,7 @@ import { gunshot, emptyGunshot } from '../audio';
 const maxLettersOnScreen = 6;
 
 type LetterGuess = {
-    id :number,
+    id :string,
     letter :string,
     hp :number,
     angle :number,
@@ -23,11 +23,6 @@ type LetterGuessProps = {
 }
 
 type updateParams = 'update' | 'destroy';
-
-/* Generates random INT between 0 and 99,999 */
-function genID() :number{
-    return Math.floor(Math.random()*100000);
-}
 
 /* Generates an INT between 0 and 100 */
 function randomPercent() :number{
@@ -58,7 +53,7 @@ function genRandomLetterGuess(letter :string) :LetterGuess{
 
     if(randomPercent() > randomCutoff){
         return {
-            id :genID(),
+            id :crypto.randomUUID(),
             letter: randomLetter(letter), 
             hp: randomPercent() > 49 ? 1 : 2,
             angle: randomRadiansAngle(),
@@ -67,7 +62,7 @@ function genRandomLetterGuess(letter :string) :LetterGuess{
     }
 
     return {
-        id :genID(),
+        id :crypto.randomUUID(),
         letter: letter,
         hp: randomPercent() > 49 ? 1 : 2,
         angle: randomRadiansAngle(),

@@ -120,10 +120,10 @@
 }
 
 .hp-1{
-    background-color: rgb(192, 156, 50, 0.5);
+    background-color: rgba(235, 47, 47, 0.5);
 }
 .hp-2{
-    background-color: rgba(55, 192, 50, 0.5);
+    background-color: rgba(29, 147, 25, 0.5);
 }
 .hp-3{
     background-color: rgba(168, 50, 192, 0.5);
