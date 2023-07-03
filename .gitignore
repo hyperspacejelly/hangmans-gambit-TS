@@ -17,6 +17,9 @@ refs
 public/assets/old
 public/assets/normalized
 
+#icon
+favicon.ico
+
 # Editor directories and files
 .vscode/*
 !.vscode/extensions.json
