@@ -114,3 +114,24 @@
         transform: scale(105%);
     }
 }
+
+@media screen and (max-width:600px) {
+    .splash-base h2{
+        text-align: center;
+        font-size: clamp(3rem, 5vw, 6rem);
+        text-transform: uppercase;
+    }
+
+    .splash-buttons{
+        text-shadow: 0px 0px 1px black;
+        display: flex;
+        flex-direction: row;
+        width: fit-content;
+        column-gap: 3svh;
+    
+        padding-bottom: 3rem;
+    
+        width: max-content;
+    }
+    
+}

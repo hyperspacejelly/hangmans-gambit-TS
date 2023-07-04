@@ -34,3 +34,24 @@
         transform: scale(130%) rotate(10deg);
     }
 }
+
+@media screen and (max-width:600px) {
+    #letters-left .title{
+        font-size: 2rem;
+
+        font-weight: 300;
+
+        text-align: left;
+
+        padding: 1rem 2rem 1rem 1rem;
+    
+        text-shadow: 0px 0px 6px black;
+
+    }
+    
+    #letters-left .number{
+        position: relative;
+        font-size: 4rem;
+        margin-left: 1rem;
+    } 
+}

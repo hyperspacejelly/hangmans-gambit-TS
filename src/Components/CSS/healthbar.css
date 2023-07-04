@@ -22,3 +22,11 @@
         transform: scale(120%);
     }
 }
+
+@media screen and (max-width: 600px) {
+    #healthbar{
+        display: flex;
+        justify-content: flex-end;
+        padding-right: 1rem;
+    }    
+}

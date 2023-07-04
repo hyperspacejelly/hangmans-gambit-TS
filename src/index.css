@@ -78,3 +78,14 @@ main{
   justify-content: center;
   align-items: center;
 }
+
+@media screen and (max-width:600px) {
+  main{
+    height: 100svh;
+    overflow: hidden;
+  }
+  #top-left,
+  #top-right{
+    padding-top: 2rem;
+  }
+}
