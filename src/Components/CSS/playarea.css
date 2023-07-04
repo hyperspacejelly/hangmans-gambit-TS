@@ -16,6 +16,8 @@
     aspect-ratio: 1/1;
 
     cursor: url('/assets/img/crosshair-wide.png') 31 31, crosshair ;
+
+    z-index: 4;
 }
 
 #play-area::before{
@@ -29,6 +31,7 @@
     -moz-border-radius: 100%;
 
     animation: spinArea 10s linear infinite, fadeIn 1s ease-out 1;
+    z-index: 5;
 }
 
 #spawn-area{
@@ -40,6 +43,7 @@
     padding: 4.5rem;
 
     animation: shakeArea 0.8s linear infinite alternate, fadeIn 1s ease-out 1;
+    z-index: 10;
 }
 
 
@@ -52,6 +56,15 @@
         transform: scale(110%);
     }
 }
+@keyframes smallShrinkGrowAnim {
+    0%{
+        transform: scale(90%);
+    }
+    100%{
+        transform: scale(100%);
+    }
+}
+
 
 @keyframes spinArea {
     0%{
@@ -144,6 +157,10 @@
         aspect-ratio: 1/1;
     }
 
+    #play-area::before{
+        animation: smallShrinkGrowAnim 0.6s linear infinite alternate;
+    }
+
     .letter-guess{
         padding: 3.5rem;
         width: 3rem;
@@ -156,6 +173,4 @@
         width: 3.5rem;
         height: 3.5rem;
     }
-
-    
 }
