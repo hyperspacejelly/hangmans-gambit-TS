@@ -26,6 +26,7 @@
     height: 100%;
     border: 4px var(--main-pink-transp) dashed;
     border-radius: 100%;
+    -moz-border-radius: 100%;
 
     animation: spinArea 10s linear infinite, fadeIn 1s ease-out 1;
 }
