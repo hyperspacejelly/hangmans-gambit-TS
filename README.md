@@ -39,6 +39,8 @@ the word list is only composed of generic 'murder investigation' vocabulary
 - On a game over or win you have the ability to start a new game with a different word.
 - To reset difficulty you currently need to reload the page.
 
+The game is playable [**here**](https://hangman.lucien-jely.fr)
+
 ## Credits
 
 All sound effects were found on [Freesound](https://www.freesound.org):
